@@ -106,7 +106,7 @@ export HOME=/root; export LANG=C; export LC_ALL=C;
 EOL
 }
 #
-# ------------renombrar-------- ---------------------------CONTINUAR AQUí
+# --------------------renombrar-------- ---------------------------CONTINUAR AQUí
 script_build() {
 	#
 	# armando script: instalando paquetes
@@ -129,7 +129,7 @@ script_build() {
 		PHPV="7.0"
 		PAQUETES="volti obmenu"
 	fi
-	cat >> $ROOT/$FILE <<EOL
+	cat >> $ROOT/$ARCHIVO <<EOL
 # Instalando paquetes (la variable reservada DEBIAN_FRONTENDestá como nointeractiva)
 export DEBIAN_FRONTEND=noninteractive
 apt install --no-install-recommends --yes \
@@ -508,7 +508,7 @@ if [ "$EJECUTAR" == "" ]; then
 	prepare
 	script_init
 	script_build
-	if [ "$NONFREE" = true ]; then
+	if [ "$NOLIBRE" = true ]; then
 		echo -e "$amarillo* Including non-free packages...$apagado"
 		script_add_nonfree
 	else
