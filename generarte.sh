@@ -106,35 +106,35 @@ export HOME=/root; export LANG=C; export LC_ALL=C;
 EOL
 }
 #
-# --------------------renombrar-------- ---------------------------CONTINUAR AQUí
+# ------------renombrar-------- ---------------------------CONTINUAR AQUí
 script_build() {
 	#
-	# Setup script: Install packages
+	# armando script: instalando paquetes
 	#
-	if [ "$ARCH" == "i386" ]; then
-		KERN="686"
+	if [ "$ARQUITECTURA" == "i386" ]; then
+		NUCLEO="686"
 	else
-		KERN="amd64"
+		NUCLEO="amd64"
 	fi
 	if [ "$BASE" == "bullseye" ]; then
-		# Bullseye-specific PHP version and packages
+		# Paquetes y PHP específico de Bullseye
 		PHPV="7.4"
-		PKGS="chromium-common chromium-sandbox volumeicon-alsa"
+		PAQUETES="chromium-common chromium-sandbox volumeicon-alsa"
 	elif [ "$BASE" == "buster" ]; then
-		# Buster uses PHP 7.3
+		# Buster usa PHP 7.3
 		PHPV="7.3"
-		PKGS="chromium-common chromium-sandbox volti obmenu"
+		PAQUETES="chromium-common chromium-sandbox volti obmenu"
 	else
-		# Stretch uses PHP 7.0
+		# Stretch usa PHP 7.0
 		PHPV="7.0"
-		PKGS="volti obmenu"
+		PAQUETES="volti obmenu"
 	fi
 	cat >> $ROOT/$FILE <<EOL
-# Install packages
+# Instalando paquetes (la variable reservada DEBIAN_FRONTENDestá como nointeractiva)
 export DEBIAN_FRONTEND=noninteractive
 apt install --no-install-recommends --yes \
 	\
-	linux-image-$KERN live-boot systemd-sysv firmware-linux-free sudo \
+	linux-image-$NUCLEO live-boot systemd-sysv firmware-linux-free sudo \
         vim-tiny pm-utils iptables-persistent iputils-ping net-tools wget \
 	openssh-client openssh-server rsync less \
 	\
@@ -152,11 +152,11 @@ apt install --no-install-recommends --yes \
 	smbclient cifs-utils nfs-common curlftpfs sshfs partclone pigz yad \
 	f2fs-tools exfat-fuse exfat-utils btrfs-progs \
 	\
-	nginx php-fpm php-cli chromium $PKGS
+	nginx php-fpm php-cli chromium $PAQUETES
 
-# Modify /etc/issue banner
-perl -p -i -e 's/^D/Redo Rescue $VER\nBased on D/' /etc/issue
-# Set vi editor preferences
+# Modificar el /etc/issue banner
+perl -p -i -e 's/^D/TIC $VER\nBasado en D/' /etc/issue
+# Setear las preferencias del editor vi --------------------------VERIFICAR----
 perl -p -i -e 's/^set compatible$/set nocompatible/g' /etc/vim/vimrc.tiny
 # Use local RTC in Linux (via /etc/adjtime) and disable network time updates
 systemctl disable systemd-timesyncd.service
@@ -245,7 +245,7 @@ script_shell() {
 	# Setup script: Insert command to open shell for making changes
 	#
 	cat >> $ROOT/$FILE << EOL
-echo -e "$red>>> Opening interactive shell. Type 'exit' when done making changes.$off"
+echo -e "$rojo>>> Opening interactive shell. Type 'exit' when done making changes.$apagado"
 echo
 bash
 EOL
@@ -279,7 +279,7 @@ chroot_exec() {
 	#
 	# Execute setup script inside chroot environment
 	#
-	echo -e "$yel* Copying assets to root directory...$off"
+	echo -e "$amarillo* Copying assets to root directory...$apagado"
 	# Copy assets before configuring plymouth theme
 	rsync -h --info=progress2 --archive \
 		./overlay/$ROOT/usr/share/* \
@@ -291,12 +291,12 @@ chroot_exec() {
 	# Run setup script inside chroot
 	chmod +x $ROOT/$FILE
 	echo
-	echo -e "$red>>> ENTERING CHROOT SYSTEM$off"
+	echo -e "$rojo>>> ENTERING CHROOT SYSTEM$apagado"
 	echo
 	sleep 2
 	chroot $ROOT/ /bin/bash -c "./$FILE"
 	echo
-	echo -e "$red>>> EXITED CHROOT SYSTEM$off"
+	echo -e "$rojo>>> EXITED CHROOT SYSTEM$apagado"
 	echo
 	sleep 2
 	rm -f $ROOT/$FILE
@@ -306,13 +306,13 @@ create_livefs() {
 	#
 	# Prepare to create new image
 	#
-	echo -e "$yel* Preparing image...$off"
+	echo -e "$amarillo* Preparing image...$apagado"
 	rm -f $ROOT/root/.bash_history
 	rm -rf image redorescue-$VER.iso
 	mkdir -p image/live
 
 	# Apply changes from overlay
-	echo -e "$yel* Applying changes from overlay...$off"
+	echo -e "$amarillo* Applying changes from overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/* \
 		.
@@ -329,7 +329,7 @@ create_livefs() {
 	echo $VER > $ROOT/var/www/html/VERSION
 
 	# Compress live filesystem
-	echo -e "$yel* Compressing live filesystem...$off"
+	echo -e "$amarillo* Compressing live filesystem...$apagado"
 	mksquashfs $ROOT/ image/live/filesystem.squashfs -e boot
 }
 
@@ -351,12 +351,12 @@ create_legacy_iso() {
 	# Create legacy ISO image for Debian 9 (version 2.0 releases)
 	#
 	if [ ! -s "image/live/filesystem.squashfs" ]; then
-		echo -e "$red* ERROR: The squashfs live filesystem is missing.$off\n"
+		echo -e "$rojo* ERROR: The squashfs live filesystem is missing.$apagado\n"
 		exit
 	fi
 
 	# Apply image changes from overlay
-	echo -e "$yel* Applying image changes from overlay...$off"
+	echo -e "$amarillo* Applying image changes from overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/image/* \
 		./image/
@@ -368,7 +368,7 @@ create_legacy_iso() {
 	perl -p -i -e "s/\\\$VERSION/$VER/g" image/isolinux/isolinux.cfg
 	
 	# Prepare image
-	echo -e "$yel* Preparing legacy image...$off"
+	echo -e "$amarillo* Preparing legacy image...$apagado"
 	mkdir image/isolinux
 	cp $ROOT/boot/vmlinuz* image/live/vmlinuz
 	cp $ROOT/boot/initrd* image/live/initrd
@@ -385,7 +385,7 @@ create_legacy_iso() {
 	cp /usr/share/misc/pci.ids image/isolinux/
 
 	# Create ISO image
-	echo -e "$yel* Creating legacy ISO image...$off"
+	echo -e "$amarillo* Creating legacy ISO image...$apagado"
 	xorriso -as mkisofs -r \
 		-J -joliet-long \
 		-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
@@ -398,9 +398,9 @@ create_legacy_iso() {
 		image
 
 	# Report final ISO size
-	echo -e "$yel\nISO image saved:"
+	echo -e "$amarillo\nISO image saved:"
 	du -sh redorescue-$VER.iso
-	echo -e "$off"
+	echo -e "$apagado"
 	echo
 	echo "Done."
 	echo
@@ -411,12 +411,12 @@ create_uefi_iso() {
 	# Create ISO image for Debian 10 (version 3.0 releases)
 	#
 	if [ ! -s "image/live/filesystem.squashfs" ]; then
-		echo -e "$red* ERROR: The squashfs live filesystem is missing.$off\n"
+		echo -e "$rojo* ERROR: The squashfs live filesystem is missing.$apagado\n"
 		exit
 	fi
 
 	# Apply image changes from overlay
-	echo -e "$yel* Applying image changes from overlay...$off"
+	echo -e "$amarillo* Applying image changes from overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/image/* \
 		./image/
@@ -485,34 +485,34 @@ create_uefi_iso() {
 	rm -rf scratch
 
 	# Report final ISO size
-	echo -e "$yel\nISO image saved:"
+	echo -e "$amarillo\nISO image saved:"
 	du -sh redorescue-$VER.iso
-	echo -e "$off"
+	echo -e "$apagado"
 	echo
 	echo "Done."
 	echo
 }
 
 
-#
-# Execute functions based on the requested action
+# ----------------------------QUINIENTOS-----------
+# Ejecutar según los modificadores
 #
 
-if [ "$ACTION" == "clean" ]; then
-	# Clean all build files
+if [ "$EJECUTAR" == "limpiar" ]; then
+	# limpia todos lOS ARCHIVOS generados
 	clean
 fi
 
-if [ "$ACTION" == "" ]; then
+if [ "$EJECUTAR" == "" ]; then
 	# Build new ISO image
 	prepare
 	script_init
 	script_build
 	if [ "$NONFREE" = true ]; then
-		echo -e "$yel* Including non-free packages...$off"
+		echo -e "$amarillo* Including non-free packages...$apagado"
 		script_add_nonfree
 	else
-		echo -e "$yel* Excluding non-free packages.$off"
+		echo -e "$amarillo* Excluding non-free packages.$apagado"
 	fi
 	script_exit
 	chroot_exec
@@ -520,9 +520,9 @@ if [ "$ACTION" == "" ]; then
 	create_iso
 fi
 
-if [ "$ACTION" == "changes" ]; then
+if [ "$EJECUTAR" == "changes" ]; then
 	# Enter existing system to make changes
-	echo -e "$yel* Updating existing image.$off"
+	echo -e "$amarillo* Updating existing image.$apagado"
 	script_init
 	script_shell
 	script_exit
@@ -531,7 +531,7 @@ if [ "$ACTION" == "changes" ]; then
 	create_iso
 fi
 
-if [ "$ACTION" == "boot" ]; then
+if [ "$EJECUTAR" == "boot" ]; then
 	# Rebuild existing ISO image (update bootloader)
 	create_iso
 fi
