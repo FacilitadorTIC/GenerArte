@@ -17,4 +17,9 @@ rojo='\e[1;31m'
 blanco='\e[1;37m'
 amarillo='\e[1;33m'
 apagado='\e[0m'
-
+#
+# Mostrar cartel de inicio
+echo -e "\n$apagado---------------------------"
+echo -e "$blanco  GENERARTE $apagado"
+echo -e "       Ver:  $VER"
+echo -e "---------------------------\n"
