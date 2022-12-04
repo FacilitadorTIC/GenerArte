@@ -72,4 +72,36 @@ preparando() {
 	fi
 }
 #
+# Configurando script -----------------------RENOMBRAR SCRIPT----
+script_init() {
+	#
+	# Configuración Base del script
+	#
+	cat > $ROOT/$ARCHIVO <<EOL
+#!/bin/bash
+# Montaje
+mount none -t proc /proc;
+mount none -t sysfs /sys;
+mount none -t devpts /dev/pts
+# Setear hostname
+echo 'TIC' > /etc/hostname
+echo 'TIC' > /etc/debian_chroot
 #
+# Setear hosts
+cat > /etc/hosts <<END
+127.0.0.1	localhost
+127.0.1.1	TIC
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+END
+# Set default locale
+cat >> /etc/bash.bashrc <<END
+export LANG="C"
+export LC_ALL="C"
+END
+#
+# Exportar entorno
+export HOME=/root; export LANG=C; export LC_ALL=C;
+EOL
+}
