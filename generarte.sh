@@ -313,7 +313,7 @@ create_livefs() {
 	mkdir -p image/live
 
 	# Aplicar  cambios superponiendo de la carpeta correspondiente
-	echo -e "$amarillo* Applying changes from overlay...$apagado"
+	echo -e "$amarillo* Aplicando cambios desde overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/* \
 		.
@@ -322,15 +322,15 @@ create_livefs() {
 	chroot $ROOT/ /bin/bash -c "chown -R root: /etc /root"
 	chroot $ROOT/ /bin/bash -c "chown -R www-data: /var/www/html"
 
-	# Enable startup of Redo monitor service
+	# Enable startup of TIC monitor service
 	chroot $ROOT/ /bin/bash -c "chmod 644 /etc/systemd/system/TIC.service"
-	chroot $ROOT/ /bin/bash -c "systemctl enable redo"
+	chroot $ROOT/ /bin/bash -c "systemctl enable TIC"
 
 	# Update version number
 	echo $VER > $ROOT/var/www/html/VERSION
 
 	# Compress live filesystem
-	echo -e "$amarillo* Compressing live filesystem...$apagado"
+	echo -e "$amarillo* Comprimiendo live filesystem...$apagado"
 	mksquashfs $ROOT/ image/live/filesystem.squashfs -e boot
 }
 
@@ -352,12 +352,12 @@ create_legacy_iso() {
 	# Create legacy ISO image for Debian 9 (version 2.0 releases)
 	#
 	if [ ! -s "image/live/filesystem.squashfs" ]; then
-		echo -e "$rojo* ERROR: The squashfs live filesystem is missing.$apagado\n"
+		echo -e "$rojo* ERROR: The squashfs live filesystem no se encuentra.$apagado\n"
 		exit
 	fi
 
 	# Apply image changes from overlay
-	echo -e "$amarillo* Applying image changes from overlay...$apagado"
+	echo -e "$amarillo* Aplicando cambios en la imagen de overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/image/* \
 		./image/
@@ -369,7 +369,7 @@ create_legacy_iso() {
 	perl -p -i -e "s/\\\$VERSION/$VER/g" image/isolinux/isolinux.cfg
 	
 	# Prepare image
-	echo -e "$amarillo* Preparing legacy image...$apagado"
+	echo -e "$amarillo* Preparando legacy image...$apagado"
 	mkdir image/isolinux
 	cp $ROOT/boot/vmlinuz* image/live/vmlinuz
 	cp $ROOT/boot/initrd* image/live/initrd
@@ -391,11 +391,11 @@ create_legacy_iso() {
 		-J -joliet-long \
 		-isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin \
 		-partition_offset 16 \
-		-A "Redo $VER" -volid "Redo Rescue $VER" \
+		-A "TIC $VER" -volid "TIC $VER" \
 		-b isolinux/isolinux.bin \
 		-c isolinux/boot.cat \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		-o redorescue-$VER.iso \
+		-o TIC-$VER.iso \
 		image
 
 	# Reporte final del tamaño de la ISO
@@ -412,7 +412,7 @@ create_uefi_iso() {
 	# Create ISO image for Debian 10 (version 3.0 releases)
 	#
 	if [ ! -s "image/live/filesystem.squashfs" ]; then
-		echo -e "$rojo* ERROR: The squashfs live filesystem is missing.$apagado\n"
+		echo -e "$rojo* ERROR: The squashfs live filesystem no se encuentra.$apagado\n"
 		exit
 	fi
 
