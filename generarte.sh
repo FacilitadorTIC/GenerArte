@@ -305,14 +305,14 @@ chroot_exec() {
 
 create_livefs() {
 	#
-	# Prepare to create new image
-	#
-	echo -e "$amarillo* Preparing image...$apagado"
+	# Preparando para crear la nueva imagen
+	# 
+	echo -e "$amarillo* Preparando imagen...$apagado"
 	rm -f $ROOT/root/.bash_history
-	rm -rf image redorescue-$VER.iso
+	rm -rf image TIC-$VER.iso
 	mkdir -p image/live
 
-	# Apply changes from overlay
+	# Aplicar  cambios superponiendo de la carpeta correspondiente
 	echo -e "$amarillo* Applying changes from overlay...$apagado"
 	rsync -h --info=progress2 --archive \
 		./overlay/* \
