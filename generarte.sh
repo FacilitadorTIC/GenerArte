@@ -278,7 +278,7 @@ EOL
 
 chroot_exec() {
 	#
-	# Execute setup script inside chroot environment
+	# Ejecutar config de script dentro del entorno chroot
 	#
 	echo -e "$amarillo* Copiando recursos al directorio root...$apagado"
 	# Copia recursos antes de configurar el tema plymouth
@@ -323,7 +323,7 @@ create_livefs() {
 	chroot $ROOT/ /bin/bash -c "chown -R www-data: /var/www/html"
 
 	# Enable startup of Redo monitor service
-	chroot $ROOT/ /bin/bash -c "chmod 644 /etc/systemd/system/redo.service"
+	chroot $ROOT/ /bin/bash -c "chmod 644 /etc/systemd/system/TIC.service"
 	chroot $ROOT/ /bin/bash -c "systemctl enable redo"
 
 	# Update version number
@@ -398,12 +398,12 @@ create_legacy_iso() {
 		-o redorescue-$VER.iso \
 		image
 
-	# Report final ISO size
-	echo -e "$amarillo\nISO image saved:"
-	du -sh redorescue-$VER.iso
+	# Reporte final del tamaño de la ISO
+	echo -e "$amarillo\nISO guardada:"
+	du -sh TIC-$VER.iso
 	echo -e "$apagado"
 	echo
-	echo "Done."
+	echo "Listo."
 	echo
 }
 
@@ -429,7 +429,7 @@ create_uefi_iso() {
 	perl -p -i -e "s/\\\$VERSION/$VER/g" image/boot/grub/grub.cfg
 
 	# Prepare boot image
-	touch image/REDO
+	touch image/TIC
         cp $ROOT/boot/vmlinuz* image/vmlinuz
         cp $ROOT/boot/initrd* image/initrd
 	mkdir -p {image/EFI/{boot,debian},image/boot/grub/{fonts,theme},scratch}
@@ -463,7 +463,7 @@ create_uefi_iso() {
 		-iso-level 3 \
 		-full-iso9660-filenames \
 		-joliet-long \
-		-volid "Redo Rescue $VER" \
+		-volid "TIC $VER" \
 		-eltorito-boot \
 			boot/grub/bios.img \
 			-no-emul-boot \
@@ -476,7 +476,7 @@ create_uefi_iso() {
 			-e EFI/efiboot.img \
 			-no-emul-boot \
 		-append_partition 2 0xef scratch/efiboot.img \
-		-output redorescue-$VER.iso \
+		-output TIC-$VER.iso \
 		-graft-points \
 			image \
 			/boot/grub/bios.img=scratch/bios.img \
@@ -487,7 +487,7 @@ create_uefi_iso() {
 
 	# Report final ISO size
 	echo -e "$amarillo\nISO image saved:"
-	du -sh redorescue-$VER.iso
+	du -sh TIC-$VER.iso
 	echo -e "$apagado"
 	echo
 	echo "Done."
