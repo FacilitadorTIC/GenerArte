@@ -368,7 +368,7 @@ create_legacy_iso() {
 	# Update version number
 	perl -p -i -e "s/\\\$VERSION/$VER/g" image/isolinux/isolinux.cfg
 	
-	# Prepare image
+	# Prepara image
 	echo -e "$amarillo* Preparando legacy image...$apagado"
 	mkdir image/isolinux
 	cp $ROOT/boot/vmlinuz* image/live/vmlinuz
@@ -428,7 +428,7 @@ create_uefi_iso() {
 	# Update version number
 	perl -p -i -e "s/\\\$VERSION/$VER/g" image/boot/grub/grub.cfg
 
-	# Prepare boot image
+	# Prepara boot image
 	touch image/TIC
         cp $ROOT/boot/vmlinuz* image/vmlinuz
         cp $ROOT/boot/initrd* image/initrd
@@ -454,7 +454,7 @@ create_uefi_iso() {
 		--fonts="" \
 		"boot/grub/grub.cfg=image/boot/grub/grub.cfg"
 
-	# Prepare image for UEFI
+	# Prepara image for UEFI
 	cat /usr/lib/grub/i386-pc/cdboot.img scratch/core.img > scratch/bios.img
 
 	# Create final ISO image
@@ -506,7 +506,7 @@ fi
 
 if [ "$EJECUTAR" == "" ]; then
 	# Build new ISO image
-	prepare
+	preparando
 	script_init
 	script_build
 	if [ "$NOLIBRE" = true ]; then
