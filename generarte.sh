@@ -158,12 +158,12 @@ apt install --no-install-recommends --yes \
 perl -p -i -e 's/^D/TIC $VER\nBasado en D/' /etc/issue
 # Setear las preferencias del editor vi --------------------------VERIFICAR----
 perl -p -i -e 's/^set compatible$/set nocompatible/g' /etc/vim/vimrc.tiny
-# Use local RTC in Linux (via /etc/adjtime) and disable network time updates
+# Usar local RTC en Linux (via /etc/adjtime) y desactivar actualizaciones de network time 
 systemctl disable systemd-timesyncd.service
-# Disable SSH server and delete keys
+# Deshabilitar el SSH server y eliminar keys
 systemctl disable ssh
 rm -f /etc/ssh/ssh_host_*
-# Prevent chromium "save password" prompts
+# Prevenir chromium "save password" 
 mkdir -p /etc/chromium/policies/managed
 cat > /etc/chromium/policies/managed/no-password-management.json <<END
 {
@@ -171,23 +171,24 @@ cat > /etc/chromium/policies/managed/no-password-management.json <<END
     "PasswordManagerEnabled": false
 }
 END
-# Add regular user
+# Añadir user regular
 useradd --create-home $USER --shell /bin/bash
 adduser $USER sudo
 echo '$USER:$USER' | chpasswd
-# Prepare single-user system
+# Preparar sistema de usuario único
 echo 'root:$USER' | chpasswd
 echo 'default_user root' >> /etc/slim.conf
 echo 'auto_login yes' >> /etc/slim.conf
 echo "Setting default plymouth theme..."
-plymouth-set-default-theme -R redo
+# Reemplazar el plymouth por una versión renovada TIC
+plymouth-set-default-theme -R TIC
 update-initramfs -u
 ln -s /usr/bin/pcmanfm /usr/bin/nautilus
-# Configure nginx/php-fpm application server
+# Configurar nginx/php-fpm como servidor de aplicaciones
 perl -p -i -e 's/^user = .*$/user = root/g' /etc/php/$PHPV/fpm/pool.d/www.conf
 perl -p -i -e 's/^group = .*$/group = root/g' /etc/php/$PHPV/fpm/pool.d/www.conf
 perl -p -i -e 's/^ExecStart=(.*)$/ExecStart=\$1 -R/g' /lib/systemd/system/php$PHPV-fpm.service
-cat > /etc/nginx/sites-available/redo <<'END'
+cat > /etc/nginx/sites-available/TIC <<'END'
 server {
 	listen		80 default_server;
 	server_name	localhost;
@@ -202,10 +203,10 @@ server {
 }
 END
 rm -f /etc/nginx/sites-enabled/default
-ln -s /etc/nginx/sites-available/redo /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/TIC /etc/nginx/sites-enabled/
 EOL
 }
-
+# ---------------------------NO LIBRE ----------------------------
 script_add_nonfree() {
 	#
 	# Setup script: Install non-free packages for hardware support
@@ -218,8 +219,8 @@ script_add_nonfree() {
 	# WARNING: Wireless connections are *NOT* recommended for backup
 	# and restore operations, but are included for other uses.
 	#
-	cat >> $ROOT/$FILE <<EOL
-echo "Adding non-free packages..."
+	cat >> $ROOT/$ARCHIVO <<EOL
+echo "Agregando paquetes no libres..."
 # Briefly activate non-free repo to install non-free firmware packages
 perl -p -i -e 's/main$/main non-free/' /etc/apt/sources.list
 apt update --yes
@@ -244,8 +245,8 @@ script_shell() {
 	#
 	# Setup script: Insert command to open shell for making changes
 	#
-	cat >> $ROOT/$FILE << EOL
-echo -e "$rojo>>> Opening interactive shell. Type 'exit' when done making changes.$apagado"
+	cat >> $ROOT/$ARCHIVO << EOL
+echo -e "$rojo>>> Abriendo shell interactivo. Escribir 'exit' cuando finalice de realizar cambios.$apagado"
 echo
 bash
 EOL
@@ -253,15 +254,15 @@ EOL
 
 script_exit() {
 	#
-	# Setup script: Clean up and exit
+	# Setup script: Limpiar todo y salir
 	#
-	cat >> $ROOT/$FILE <<EOL
-# Save space
+	cat >> $ROOT/$ARCHIVO <<EOL
+# Liberar espacio
 rm -f /usr/bin/{rpcclient,smbcacls,smbclient,smbcquotas,smbget,smbspool,smbtar}
 rm -f /usr/share/icons/*/icon-theme.cache
 rm -rf /usr/share/doc
 rm -rf /usr/share/man
-# Clean up and exit
+# Limpiar y salir
 apt-get autoremove && apt-get clean
 rm -rf /var/lib/dbus/machine-id
 rm -rf /tmp/*
@@ -279,8 +280,8 @@ chroot_exec() {
 	#
 	# Execute setup script inside chroot environment
 	#
-	echo -e "$amarillo* Copying assets to root directory...$apagado"
-	# Copy assets before configuring plymouth theme
+	echo -e "$amarillo* Copiando recursos al directorio root...$apagado"
+	# Copia recursos antes de configurar el tema plymouth
 	rsync -h --info=progress2 --archive \
 		./overlay/$ROOT/usr/share/* \
 		./$ROOT/usr/share/
@@ -289,17 +290,17 @@ chroot_exec() {
 	cp /etc/resolv.conf ./$ROOT/etc/
 
 	# Run setup script inside chroot
-	chmod +x $ROOT/$FILE
+	chmod +x $ROOT/$ARCHIVO
 	echo
-	echo -e "$rojo>>> ENTERING CHROOT SYSTEM$apagado"
-	echo
-	sleep 2
-	chroot $ROOT/ /bin/bash -c "./$FILE"
-	echo
-	echo -e "$rojo>>> EXITED CHROOT SYSTEM$apagado"
+	echo -e "$rojo>>> Ingresando al sistema CHROOT $apagado"
 	echo
 	sleep 2
-	rm -f $ROOT/$FILE
+	chroot $ROOT/ /bin/bash -c "./$ARCHIVO"
+	echo
+	echo -e "$rojo>>> SALIENDO DE CHROOT$apagado"
+	echo
+	sleep 2
+	rm -f $ROOT/$ARCHIVO
 }
 
 create_livefs() {
