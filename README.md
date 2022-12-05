@@ -19,10 +19,10 @@ Para generar la ISO en GNU Linux
   2. `cd generarte`
   3. `sudo ./make`
 
-LuegoAfter building, it's easy to modify a file or install a package without rebuilding and downloading all the packages again:
+Luego, para modificar:
 
   1. `sudo ./make changes`
   
-## License
+## Licencia
 
 **GeneArte** is released under the GNU GPLv3.
